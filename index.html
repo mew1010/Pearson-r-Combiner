@@ -1,11 +1,11 @@
 <!DOCTYPE atrocious:pearson_r_combiner.html
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" id="app-lang">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pearson r Combiner</title>
-    <!-- YENİ: Favicon, ZİNCİR SİMGESİYLE GÜNCELLENDİ -->
+    <!-- YENİ: SEO ve Favicon Eklendi -->
     <meta name="description" content="Pearson r korelasyon katsayılarını Fisher'ın Z dönüşümü metoduyla birleştirerek tek bir ağırlıklı ortalama hesaplayın.">
     <link rel="icon" type="image/png" href="https://placehold.co/32x32/1d4ed8/ffffff?text=🔗">
 
@@ -38,54 +38,99 @@
         .footer-signature:active {
             color: #1d4ed8; /* Tıklama anında daha koyu mavi */
         }
+        /* Ana içerik, geniş ekranlarda iki sütunlu ızgarayı korur */
+        .main-content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        @media (min-width: 1024px) {
+            .main-content-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        /* Yeni: Yeşil Sabitleme Butonu Stili */
+        .btn-lock-default {
+            background-color: #10b981; /* Tailwind emerald-500 */
+        }
+        .btn-lock-default:hover {
+            background-color: #059669; /* Tailwind emerald-600 */
+        }
+        .icon-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            /* BOŞLUK AZALTILDI: 10px'den 5px'e düşürüldü */
+            margin: 0 5px; 
+            transition: opacity 0.2s;
+        }
+        .icon-link:hover {
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8 min-h-screen flex items-center justify-center flex-col">
 
     <div class="w-full max-w-4xl">
+        <!-- YENİ BÖLÜM: DİL SEÇİM BUTONLARI -->
+        <div class="flex justify-end space-x-2 mb-4">
+            <button onclick="setLanguage('tr')" id="lang-tr" class="text-sm font-semibold px-3 py-1 rounded-full border border-indigo-600 text-white bg-indigo-600">TR</button>
+            <button onclick="setLanguage('en')" id="lang-en" class="text-sm font-semibold px-3 py-1 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100">EN</button>
+        </div>
+        
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-2">🔗 Pearson r Birleştirici</h1>
-            <p class="text-gray-500">Fisher'ın Z Dönüşümü ile ağırlıklı ortalama korelasyon hesaplama aracı.</p>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-2" data-tr="🔗 Pearson r Birleştirici" data-en="🔗 Pearson r Combiner">🔗 Pearson r Birleştirici</h1>
+            <p class="text-gray-500" data-tr="Fisher'ın Z Dönüşümü ile ağırlıklı ortalama korelasyon hesaplama aracı." data-en="Weighted average correlation calculation tool using Fisher's Z-Transformation.">Fisher'ın Z Dönüşümü ile ağırlıklı ortalama korelasyon hesaplama aracı.</p>
         </header>
 
-        <div class="bg-white card rounded-xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- ANA KART: GİRİŞ VE MEVCUT KORELASYONLAR (İKİ SÜTUNLU YAPI) -->
+        <div class="bg-white card rounded-xl p-6 sm:p-10 main-content-grid">
             
-            <!-- Veri Giriş Alanı -->
+            <!-- SOL SÜTUN: Veri Giriş Alanı -->
             <div>
-                <h2 class="text-xl font-bold text-indigo-600 mb-4 border-b pb-2">Alt Boyut ve r Katsayısı</h2>
+                <h2 class="text-xl font-bold text-indigo-600 mb-4 border-b pb-2" data-tr="Alt Boyut ve r Katsayısı" data-en="Subscale and r Coefficient">Alt Boyut ve r Katsayısı</h2>
                 
-                <div class="space-y-4">
+                <div class="space-y-4"> 
                     
                     <!-- Alt Boyut Adı Girişi -->
                     <div>
-                        <label for="entry_title" class="block text-sm font-medium text-gray-700 mb-1">Alt Boyut Adı (Örn: Planlama, İzleme, Değerlendirme):</label>
-                        <input type="text" id="entry_title" placeholder="Alt boyut adı"
+                        <label for="entry_title" class="block text-sm font-medium text-gray-700 mb-1" data-tr="Alt Boyut Adı (Örn: Planlama, İzleme, Değerlendirme):" data-en="Subscale Name (Ex: Planning, Monitoring, Evaluation):">Alt Boyut Adı (Örn: Planlama, İzleme, Değerlendirme):</label>
+                        <input type="text" id="entry_title" data-tr-placeholder="Alt boyut adı" data-en-placeholder="Subscale name" placeholder="Alt boyut adı"
                                onkeydown="handleKeydown(event)"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
-                        <p id="title_error" class="text-sm text-red-500 mt-1 hidden">Lütfen alt boyutun adını girin.</p>
+                        <p id="title_error" class="text-sm text-red-500 mt-1 hidden" data-tr="Lütfen alt boyutun adını girin." data-en="Please enter the name of the subscale.">Lütfen alt boyutun adını girin.</p>
                     </div>
 
-                    <!-- r Katsayısı Girişi -->
+                    <!-- r Katsayısı Girişi (TİPİ TEXT OLARAK DEĞİŞTİRİLDİ) -->
                     <div>
-                        <label for="r_score" class="block text-sm font-medium text-gray-700 mb-1">Korelasyon Katsayısı (<span class="symbol">r</span>):</label>
-                        <input type="number" id="r_score" placeholder="-1.0 ile 1.0 arasında" step="0.01" min="-1" max="1"
+                        <label for="r_score" class="block text-sm font-medium text-gray-700 mb-1" data-tr="Korelasyon Katsayısı (r):" data-en="Correlation Coefficient (r):">Korelasyon Katsayısı (<span class="symbol">r</span>):</label>
+                        <input type="text" id="r_score" data-tr-placeholder="-1.0 ile 1.0 arasında" data-en-placeholder="Between -1.0 and 1.0"
+                               value="0." 
                                onkeydown="handleKeydown(event)"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
-                        <p id="r_error" class="text-sm text-red-500 mt-1 hidden">Lütfen -1 ile 1 arasında geçerli bir <span class="symbol">r</span> değeri girin.</p>
+                        <p id="r_error" class="text-sm text-red-500 mt-1 hidden" data-tr="Lütfen -1 ile 1 arasında geçerli bir r değeri girin." data-en="Please enter a valid r value between -1 and 1.">Lütfen -1 ile 1 arasında geçerli bir <span class="symbol">r</span> değeri girin.</p>
                     </div>
 
                     <!-- n Örneklem Büyüklüğü Girişi -->
                     <div>
-                        <label for="n_size" class="block text-sm font-medium text-gray-700 mb-1">Örneklem Büyüklüğü (<span class="symbol">n</span>):</label>
-                        <input type="number" id="n_size" placeholder="Minimum 3 olmalıdır" step="1" min="3"
-                               onkeydown="handleKeydown(event)"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
-                        <p id="n_error" class="text-sm text-red-500 mt-1 hidden">Lütfen 3 veya daha büyük bir <span class="symbol">n</span> değeri girin.</p>
+                        <label for="n_size" class="block text-sm font-medium text-gray-700 mb-1" data-tr="Örneklem Büyüklüğü (n):" data-en="Sample Size (n):">Örneklem Büyüklüğü (<span class="symbol">n</span>):</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="n_size" data-tr-placeholder="Minimum 3 olmalıdır" data-en-placeholder="Minimum 3 is required" placeholder="Minimum 3 olmalıdır" step="1" min="3"
+                                   onkeydown="handleKeydown(event)"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                            <button onclick="toggleNLock()" id="n_lock_button"
+                                    class="flex-shrink-0 text-white font-semibold px-3 py-2 rounded-lg transition duration-150 text-sm btn-lock-default" data-tr="Sabitle" data-en="Lock">
+                                Sabitle
+                            </button>
+                        </div>
+                        <p id="n_error" class="text-sm text-red-500 mt-1 hidden" data-tr="Lütfen 3 veya daha büyük bir n değeri girin." data-en="Please enter an n value of 3 or greater.">Lütfen 3 veya daha büyük bir <span class="symbol">n</span> değeri girin.</p>
                     </div>
 
                     <!-- Ekle Butonu -->
                     <button onclick="addEntry()"
-                            class="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
+                            class="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50" data-tr="Alt Boyutu Ekle" data-en="Add Subscale">
                         Alt Boyutu Ekle
                     </button>
                     
@@ -94,72 +139,192 @@
                 </div>
             </div>
 
-            <!-- Girilen Veri ve Sonuç Alanı -->
-            <div>
-                <h2 class="text-xl font-bold text-green-600 mb-4 border-b pb-2">Girilen Korelasyonlar ve Sonuç</h2>
+            <!-- SAĞ SÜTUN: Mevcut Korelasyonlar ve Sonuçlar -->
+            <div class="bg-white p-0">
+                
+                <!-- GİRİLEN KORELASYONLAR VE HESAPLAMA -->
+                <h2 class="text-xl font-bold text-green-600 mb-4 border-b pb-2" data-tr="Girilen Korelasyonlar ve Sonuç" data-en="Inputted Correlations and Result">Girilen Korelasyonlar ve Sonuç</h2>
                 
                 <!-- Veri Listesi -->
-                <div id="data_list" class="space-y-2 max-h-64 overflow-y-auto mb-6 p-2 bg-gray-50 rounded-lg border">
+                <div id="data_list" class="space-y-2 max-h-48 overflow-y-auto mb-6 p-2 bg-gray-50 rounded-lg border">
                     <!-- Veri girişleri buraya eklenecek -->
-                    <p id="placeholder_text" class="text-gray-400 italic text-sm text-center py-4">Henüz alt boyut korelasyonu eklenmedi.</p>
+                    <p id="placeholder_text" class="text-gray-400 italic text-sm text-center py-4" data-tr="Henüz alt boyut korelasyonu eklenmedi." data-en="No subscale correlation has been added yet.">Henüz alt boyut korelasyonu eklenmedi.</p>
                 </div>
 
                 <!-- Hesapla Butonu -->
                 <button onclick="calculateCombinedR()"
                         class="w-full bg-green-600 text-white font-semibold py-2.5 rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 disabled:bg-gray-400"
-                        id="calculate_button" disabled>
+                        id="calculate_button" disabled data-tr="Birleştirilmiş r'yi Hesapla" data-en="Calculate Combined r">
                     Birleştirilmiş r'yi Hesapla
                 </button>
 
                 <!-- Temizle Butonu -->
                 <button onclick="clearAllData()"
-                        class="w-full mt-2 bg-red-500 text-white font-semibold py-2.5 rounded-lg hover:bg-red-600 transition duration-200 focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50">
+                        class="w-full mt-2 bg-red-500 text-white font-semibold py-2.5 rounded-lg hover:bg-red-600 transition duration-200 focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50" data-tr="Tüm Verileri Temizle" data-en="Clear All Data">
                     Tüm Verileri Temizle
                 </button>
 
                 <!-- Sonuç Ekranı -->
                 <div id="results_area" class="mt-6 p-4 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hidden">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Hesaplama Sonuçları</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3" data-tr="Hesaplama Sonuçları" data-en="Calculation Results">Hesaplama Sonuçları</h3>
                     <div class="space-y-2">
                         <!-- Birleştirilmiş r skoru ve Kopyala butonu -->
                         <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-indigo-200">
                             <p class="text-base text-gray-700">
-                                <span class="font-medium text-indigo-700">Birleştirilmiş Pearson <span class="symbol">r</span>:</span> 
+                                <span class="font-medium text-indigo-700" data-tr="Birleştirilmiş Pearson r:" data-en="Combined Pearson r:">Birleştirilmiş Pearson <span class="symbol">r</span>:</span> 
                                 <span id="combined_r" class="font-bold text-xl ml-2 text-indigo-900"></span>
                             </p>
                             <button onclick="copyResult()" id="copy_button"
-                                    class="bg-indigo-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-indigo-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                                    class="bg-indigo-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-indigo-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-400" data-tr="Kopyala" data-en="Copy">
                                 Kopyala
                             </button>
                         </div>
                         
-                        <p class="text-sm text-gray-600"><span class="font-medium">Ortalama Fisher <span class="symbol">Z</span> (<span class="symbol">Z̄</span>):</span> <span id="avg_z" class="ml-2"></span></p>
-                        <p class="text-xs text-gray-500 italic">Not: Bu hesaplama, her bir alt boyut korelasyonunun örneklem büyüklüğü (<span class="symbol">n</span>) ile ağırlıklandırıldığı Fisher'ın <span class="symbol">Z</span> dönüşümüne dayanır.</p>
+                        <p class="text-sm text-gray-600"><span class="font-medium" data-tr="Ortalama Fisher Z (Z̄):" data-en="Average Fisher Z (Z̄):">Ortalama Fisher <span class="symbol">Z</span> (<span class="symbol">Z̄</span>):</span> <span id="avg_z" class="ml-2"></span></p>
+                        <p class="text-xs text-gray-500 italic" data-tr="Not: Bu hesaplama, her bir alt boyut korelasyonunun örneklem büyüklüğü (n) ile ağırlıklandırıldığı Fisher'ın Z dönüşümüne dayanır." data-en="Note: This calculation is based on Fisher's Z-transformation, where each subscale correlation is weighted by its sample size (n).">Not: Bu hesaplama, her bir alt boyut korelasyonunun örneklem büyüklüğü (<span class="symbol">n</span>) ile ağırlıklandırıldığı Fisher'ın <span class="symbol">Z</span> dönüşümüne dayanır.</p>
                         
                         <!-- Kopyalama geri bildirimi için mesaj alanı -->
                         <div id="copy_message_area" class="text-sm text-center py-1 rounded-lg hidden"></div>
                     </div>
                 </div>
             </div>
+            <!-- SAĞ SÜTUN SONU -->
         </div>
+
+        <!-- GEÇMİŞ BİRLEŞTİRMELER (ALTTA, TAM GENİŞLİKTE) -->
+        <div class="bg-white card rounded-xl p-6 sm:p-10 mt-8">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="text-xl font-bold text-gray-800" data-tr="Geçmiş Birleştirmeler (Son 10 Kayıt)" data-en="Past Combinations (Last 10 Records)">Geçmiş Birleştirmeler (Son 10 Kayıt)</h2>
+                <button onclick="clearHistory()" id="clear_history_button"
+                        class="text-xs text-red-500 hover:text-red-700 font-semibold hidden disabled:text-gray-400 transition duration-150" data-tr="Geçmişi Temizle" data-en="Clear History">
+                    Geçmişi Temizle
+                </button>
+            </div>
+            
+            <div id="history_list" class="space-y-3">
+                <!-- Kayıtlar buraya yüklenecek -->
+            </div>
+        </div>
+        <!-- GEÇMİŞ BİRLEŞTİRMELER SONU -->
     </div>
     
-    <!-- Alt Bilgi (FOOTER) - EFEKT KORUNDU -->
+    <!-- Alt Bilgi (FOOTER) - LOGOLAR GÜNCELLENDİ -->
     <footer class="mt-8 text-center text-gray-800 text-base font-bold italic flex flex-col items-center">
         <span class="footer-signature">⚡ Made by Anıl Sarıalai ⚡</span> 
-        <span class="text-sm font-normal not-italic mt-1">
-            <a href="mailto:anilsarialai@gmail.com" class="text-gray-600 hover:text-indigo-600 transition duration-150">anilsarialai@gmail.com</a>
+        <span class="text-sm font-normal not-italic mt-1 flex items-center">
+            
+            <!-- GMAIL LOGOSU (YENİ SADE ZARF SİMGESİ) -->
+            <a href="mailto:anilsarialai@gmail.com" class="icon-link" title="E-posta Gönder (anilsarialai@gmail.com)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-600 hover:text-black">
+                    <path d="M1.5 8.75c0-.966.784-1.75 1.75-1.75h17c.966 0 1.75.784 1.75 1.75v6.5c0 .966-.784 1.75-1.75 1.75h-17c-.966 0-1.75-.784-1.75-1.75v-6.5zm1.75-.25a.25.25 0 0 0-.25.25v6.5c0 .138.112.25.25.25h17a.25.25 0 0 0 .25-.25v-6.5a.25.25 0 0 0-.25-.25h-17zm1.196.486l6.63 4.972a.75.75 0 0 0 .948 0l6.63-4.972c.162-.121.378-.063.447.135.069.198-.01.424-.172.545l-6.72 5.04a2.25 2.25 0 0 1-2.822 0l-6.72-5.04c-.162-.121-.241-.347-.172-.545.069-.198.285-.256.447-.135z"/>
+                </svg>
+            </a>
+            
+            <!-- GITHUB LOGOSU -->
+            <a href="https://github.com/mew1010/Pearson-r-Combiner" target="_blank" rel="noopener noreferrer" class="icon-link" title="GitHub Deposu">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-600 hover:text-black">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.419 2.864 8.199 6.836 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.704-2.782.605-3.37-.271-3.37-.271-.454-1.155-1.107-1.465-1.107-1.465-.905-.62.068-.608.068-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.918.831.092-.647.35-1.087.636-1.334-2.22-.253-4.555-1.11-4.555-4.943 0-1.092.39-1.983 1.03-2.675-.104-.252-.445-1.266.098-2.651 0 0 .84-.272 2.75 1.025.795-.22 1.635-.33 2.47-.33.835 0 1.675.11 2.47.33 1.91-1.297 2.75-1.025 2.75-1.025.543 1.385.202 2.399.098 2.651.64.692 1.03 1.583 1.03 2.675 0 3.843-2.335 4.687-4.567 4.935.359.309.678.922.678 1.867 0 1.334-.012 2.41-.012 2.723 0 .268.18.58.688.482C19.136 20.198 22 16.419 22 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
+                </svg>
+            </a>
         </span>
     </footer>
 
     <script>
+        // Dil çevirileri için JSON nesnesi
+        const translations = {
+            tr: {
+                title: "🔗 Pearson r Birleştirici",
+                subtitle: "Fisher'ın Z Dönüşümü ile ağırlıklı ortalama korelasyon hesaplama aracı.",
+                section_input: "Alt Boyut ve r Katsayısı",
+                label_subscale: "Alt Boyut Adı (Örn: Planlama, İzleme, Değerlendirme):",
+                placeholder_subscale: "Alt boyut adı",
+                error_subscale: "Lütfen alt boyutun adını girin.",
+                label_r: "Korelasyon Katsayısı (r):",
+                placeholder_r: "-1.0 ile 1.0 arasında",
+                error_r: "Lütfen -1 ile 1 arasında geçerli bir r değeri girin.",
+                label_n: "Örneklem Büyüklüğü (n):",
+                placeholder_n: "Minimum 3 olmalıdır",
+                button_lock: "Sabitle",
+                error_n: "Lütfen 3 veya daha büyük bir n değeri girin.",
+                button_add: "Alt Boyutu Ekle",
+                section_output: "Girilen Korelasyonlar ve Sonuç",
+                placeholder_list: "Henüz alt boyut korelasyonu eklenmedi.",
+                button_calculate: "Birleştirilmiş r'yi Hesapla",
+                button_clear_all: "Tüm Verileri Temizle",
+                results_heading: "Hesaplama Sonuçları",
+                label_combined_r: "Birleştirilmiş Pearson r:",
+                label_avg_z: "Ortalama Fisher Z (Z̄):",
+                note_calculation: "Not: Bu hesaplama, her bir alt boyut korelasyonunun örneklem büyüklüğü (n) ile ağırlıklandırıldığı Fisher'ın Z dönüşümüne dayanır.",
+                section_history: "Geçmiş Birleştirmeler (Son 10 Kayıt)",
+                button_clear_history: "Geçmişi Temizle",
+                placeholder_history: "Henüz kaydedilmiş bir birleştirme yok.",
+                button_load: "Bu Kaydı Yükle",
+                msg_n_locked: (n) => `Örneklem büyüklüğü N=${n} olarak sabitlendi.`,
+                msg_n_unlocked: "Örneklem büyüklüğü kilidi kaldırıldı.",
+                msg_entry_added: (title, n) => `"${title}" alt boyutu başarıyla eklendi (N=${n}).`,
+                msg_entry_removed: "Alt boyut korelasyonu kaldırıldı.",
+                msg_clear_all: "Tüm veriler temizlendi. Yeni bir hesaplamaya başlayabilirsiniz.",
+                msg_copy_success: (r) => `"${r}" panoya kopyalandı!`,
+                msg_invalid_fields: "Lütfen tüm geçerli alanları doldurun.",
+                msg_min_entries: "Hesaplama için en az 2 alt boyut korelasyonu gereklidir.",
+                msg_restore_success: (r) => `"${r}" sonucuyla birlikte geçmiş kayıt başarıyla yüklendi.`,
+                msg_history_cleared: "Tüm geçmiş kayıtları başarıyla silindi."
+            },
+            en: {
+                title: "🔗 Pearson r Combiner",
+                subtitle: "Weighted average correlation calculation tool using Fisher's Z-Transformation.",
+                section_input: "Subscale and r Coefficient",
+                label_subscale: "Subscale Name (Ex: Planning, Monitoring, Evaluation):",
+                placeholder_subscale: "Subscale name",
+                error_subscale: "Please enter the name of the subscale.",
+                label_r: "Correlation Coefficient (r):",
+                placeholder_r: "Between -1.0 and 1.0",
+                error_r: "Please enter a valid r value between -1 and 1.",
+                label_n: "Sample Size (n):",
+                placeholder_n: "Minimum 3 is required",
+                button_lock: "Lock",
+                error_n: "Please enter an n value of 3 or greater.",
+                button_add: "Add Subscale",
+                section_output: "Inputted Correlations and Result",
+                placeholder_list: "No subscale correlation has been added yet.",
+                button_calculate: "Calculate Combined r",
+                button_clear_all: "Clear All Data",
+                results_heading: "Calculation Results",
+                label_combined_r: "Combined Pearson r:",
+                label_avg_z: "Average Fisher Z (Z̄):",
+                note_calculation: "Note: This calculation is based on Fisher's Z-transformation, where each subscale correlation is weighted by its sample size (n).",
+                section_history: "Past Combinations (Last 10 Records)",
+                button_clear_history: "Clear History",
+                placeholder_history: "No recorded combination yet.",
+                button_load: "Load This Record",
+                msg_n_locked: (n) => `Sample size N=${n} is locked.`,
+                msg_n_unlocked: "Sample size lock removed.",
+                msg_entry_added: (title, n) => `"${title}" subscale added successfully (N=${n}).`,
+                msg_entry_removed: "Subscale correlation removed.",
+                msg_clear_all: "All data cleared. You can start a new calculation.",
+                msg_copy_success: (r) => `"${r}" copied to clipboard!`,
+                msg_invalid_fields: "Please fill in all valid fields.",
+                msg_min_entries: "At least 2 subscale correlations are required for calculation.",
+                msg_restore_success: (r) => `Past record successfully loaded with result "${r}".`,
+                msg_history_cleared: "All history records successfully deleted."
+            }
+        };
+
+        // Mevcut dil durumu
+        let currentLang = document.documentElement.lang || 'tr';
+        
         // Uygulama verilerini tutan global dizi
         let correlationData = [];
         
+        // Sabitleme durumu ve değeri
+        let isNLocked = false;
+        let lockedNValue = null;
+
         // Element referansları
         const titleInput = document.getElementById('entry_title');
         const rScoreInput = document.getElementById('r_score');
         const nSizeInput = document.getElementById('n_size');
+        const nLockButton = document.getElementById('n_lock_button');
         const titleError = document.getElementById('title_error');
         const rError = document.getElementById('r_error');
         const nError = document.getElementById('n_error');
@@ -170,6 +335,133 @@
         const messageArea = document.getElementById('message_area');
         const combinedRText = document.getElementById('combined_r');
         const copyMessageArea = document.getElementById('copy_message_area');
+        const historyListElement = document.getElementById('history_list');
+        const langTrButton = document.getElementById('lang-tr');
+        const langEnButton = document.getElementById('lang-en');
+
+
+        // Geçmiş depolama anahtarı
+        const HISTORY_KEY = 'pearson_r_history';
+
+        /**
+         * Başlangıçta geçmişi yükler ve R skorunu '0.' olarak ayarlar.
+         */
+        function init() {
+            // Dil ayarını local storage'dan yükle veya varsayılanı kullan
+            const savedLang = localStorage.getItem('appLang');
+            setLanguage(savedLang || 'tr', false); 
+
+            loadHistory();
+            rScoreInput.value = '0.'; // R skorunu sayfa yüklendiğinde ayarla
+        }
+
+        /**
+         * Arayüz metinlerini seçilen dile göre çevirir.
+         * @param {string} lang Seçilen dil kodu ('tr' veya 'en').
+         * @param {boolean} save Kaydedilip kaydedilmeyeceği.
+         */
+        function setLanguage(lang, save = true) {
+            if (!translations[lang]) return;
+
+            currentLang = lang;
+            document.documentElement.lang = lang; 
+
+            // Tüm data-tr/data-en özniteliklerine sahip elementleri güncelle
+            document.querySelectorAll('[data-tr], [data-en]').forEach(el => {
+                const key = el.getAttribute(`data-${lang}`);
+                if (key) {
+                    // Sadece metin içeriğini günceller
+                    if (el.children.length === 0 || el.tagName === 'BUTTON') { 
+                        el.textContent = key;
+                    } else {
+                         // İçinde sembol veya başka element olan başlıklar için
+                        let content = key;
+                        content = content.replace('(r)', '<span class="symbol">r</span>');
+                        content = content.replace('(n)', '<span class="symbol">n</span>');
+                        content = content.replace('(Z̄)', '<span class="symbol">Z̄</span>');
+                        el.innerHTML = content;
+                    }
+                }
+            });
+            
+            // Placeholder'ları güncelle
+            document.querySelectorAll('[data-tr-placeholder], [data-en-placeholder]').forEach(el => {
+                const placeholderKey = el.getAttribute(`data-${lang}-placeholder`);
+                if (placeholderKey) {
+                    el.placeholder = placeholderKey;
+                }
+            });
+
+            // Sabitleme butonu metnini elle güncelle (kilitli ise)
+            if (isNLocked) {
+                nLockButton.textContent = `${lang === 'tr' ? 'Kilitli' : 'Locked'} (N=${lockedNValue})`;
+            } else {
+                nLockButton.textContent = translations[lang].button_lock;
+            }
+            
+            // Aktif buton stilini ayarla
+            langTrButton.className = lang === 'tr' ? "text-sm font-semibold px-3 py-1 rounded-full border border-indigo-600 text-white bg-indigo-600" : "text-sm font-semibold px-3 py-1 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100";
+            langEnButton.className = lang === 'en' ? "text-sm font-semibold px-3 py-1 rounded-full border border-indigo-600 text-white bg-indigo-600" : "text-sm font-semibold px-3 py-1 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100";
+
+
+            if (save) {
+                localStorage.setItem('appLang', lang);
+            }
+            
+            // Giriş değerini korurken placeholder'ı güncelle
+            rScoreInput.placeholder = translations[lang].placeholder_r;
+
+            // Geçmiş listesi de çeviriye bağlı olduğu için yeniden render edilir
+            renderHistoryList(loadHistory()); 
+            
+            // Veri listesi de yeniden render edilir
+            renderDataList(); 
+        }
+
+        /**
+         * n giriş alanının sabitleme durumunu değiştirir.
+         */
+        function toggleNLock() {
+            const lang = currentLang;
+            if (!isNLocked) {
+                // Kilitleme işlemi
+                const n = parseInt(nSizeInput.value, 10);
+                
+                // 1. Giriş Doğrulaması (Sabitleme için de geçerli)
+                if (isNaN(n) || n < 3) {
+                    toggleError(nError, true);
+                    showMessage(translations[lang].error_n, 'bg-red-100 text-red-700'); 
+                    return;
+                }
+                toggleError(nError, false);
+
+                isNLocked = true;
+                lockedNValue = n;
+                nSizeInput.disabled = true;
+                nLockButton.textContent = `${lang === 'tr' ? 'Kilitli' : 'Locked'} (N=${n})`;
+                
+                // Yeşil kilitleme stili
+                nLockButton.classList.remove('btn-lock-default', 'bg-gray-400', 'hover:bg-gray-500');
+                nLockButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                
+                showMessage(translations[lang].msg_n_locked(n), 'bg-indigo-100 text-indigo-700');
+
+            } else {
+                // Kilidi açma işlemi
+                isNLocked = false;
+                lockedNValue = null;
+                nSizeInput.disabled = false;
+                nSizeInput.value = '';
+                nSizeInput.focus();
+                nLockButton.textContent = translations[lang].button_lock;
+                
+                // Varsayılan (Yeşil) sabitleme stili
+                nLockButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                nLockButton.classList.add('btn-lock-default');
+                
+                showMessage(translations[lang].msg_n_unlocked, 'bg-yellow-100 text-yellow-700');
+            }
+        }
 
 
         /**
@@ -197,9 +489,18 @@
          * Yeni bir (r, n) çiftini veri listesine ekler.
          */
         function addEntry() {
+            const lang = currentLang;
             const title = titleInput.value.trim();
             const r = parseFloat(rScoreInput.value);
-            const n = parseInt(nSizeInput.value, 10);
+            
+            // N değerini sabitleme durumuna göre al
+            let n;
+            if (isNLocked) {
+                n = lockedNValue;
+            } else {
+                n = parseInt(nSizeInput.value, 10);
+            }
+            
             let isValid = true;
 
             // 1. Giriş Doğrulamaları
@@ -210,6 +511,7 @@
                 toggleError(titleError, false);
             }
 
+            // Doğrulama: Giriş tipi artık metin olduğu için manuel kontrol
             if (isNaN(r) || r < -1 || r > 1) {
                 toggleError(rError, true);
                 isValid = false;
@@ -217,15 +519,19 @@
                 toggleError(rError, false);
             }
 
+            // N kontrolü, kilitli olsa bile geçerliliğini korumalıdır.
             if (isNaN(n) || n < 3) {
-                toggleError(nError, true);
+                // Eğer N kilitli değilse ve hata varsa, N hatasını göster.
+                if (!isNLocked) {
+                    toggleError(nError, true);
+                }
                 isValid = false;
             } else {
                 toggleError(nError, false);
             }
 
             if (!isValid) {
-                showMessage('Lütfen tüm geçerli alanları doldurun.', 'bg-red-100 text-red-700');
+                showMessage(translations[lang].msg_invalid_fields, 'bg-red-100 text-red-700');
                 return;
             }
 
@@ -234,13 +540,16 @@
             
             // 3. UI Güncelleme
             titleInput.value = '';
-            rScoreInput.value = '';
-            nSizeInput.value = '';
+            rScoreInput.value = '0.'; // R değeri eklendikten sonra '0.' olarak ayarlanır.
+            // N kilitli değilse, N girişini temizle
+            if (!isNLocked) {
+                nSizeInput.value = '';
+            }
             titleInput.focus(); // Başlık alanına odaklanarak hızlı giriş sağlama
             
             renderDataList();
             
-            showMessage(`"${title}" alt boyutu başarıyla eklendi.`, 'bg-green-100 text-green-700');
+            showMessage(translations[lang].msg_entry_added(title, n), 'bg-green-100 text-green-700');
             
             // 4. Hesapla butonunu etkinleştirme
             calculateButton.disabled = correlationData.length < 2;
@@ -252,7 +561,7 @@
         function renderDataList() {
             dataList.innerHTML = '';
             if (correlationData.length === 0) {
-                dataList.innerHTML = '<p id="placeholder_text" class="text-gray-400 italic text-sm text-center py-4">Henüz alt boyut korelasyonu eklenmedi.</p>';
+                dataList.innerHTML = `<p id="placeholder_text" class="text-gray-400 italic text-sm text-center py-4">${translations[currentLang].placeholder_list}</p>`;
                 resultsArea.classList.add('hidden');
                 calculateButton.disabled = true;
                 return;
@@ -267,7 +576,7 @@
                         <!-- R skoru gösterimi 3 ondalık haneye (toFixed(3)) ayarlandı -->
                         <span class="text-gray-600 text-sm mt-1">r = ${data.r.toFixed(3)}, n = ${data.n}</span>
                     </div>
-                    <button onclick="removeEntry(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold transition duration-150 mt-2 sm:mt-0">Kaldır</button>
+                    <button onclick="removeEntry(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold transition duration-150 mt-2 sm:mt-0">${currentLang === 'tr' ? 'Kaldır' : 'Remove'}</button>
                 `;
                 dataList.appendChild(item);
             });
@@ -280,7 +589,7 @@
         function removeEntry(index) {
             correlationData.splice(index, 1);
             renderDataList();
-            showMessage('Alt boyut korelasyonu kaldırıldı.', 'bg-yellow-100 text-yellow-700');
+            showMessage(translations[currentLang].msg_entry_removed, 'bg-yellow-100 text-yellow-700');
             calculateButton.disabled = correlationData.length < 2;
             if (correlationData.length < 2) {
                 resultsArea.classList.add('hidden');
@@ -291,6 +600,13 @@
          * Bütün verileri ve sonuçları temizler.
          */
         function clearAllData() {
+            const lang = currentLang;
+
+            // N kilidini kaldır
+            if (isNLocked) {
+                toggleNLock();
+            }
+
             // Veri dizisini temizle
             correlationData = [];
             
@@ -299,36 +615,21 @@
             
             // Giriş alanlarını temizle
             titleInput.value = '';
-            rScoreInput.value = '';
+            rScoreInput.value = '0.'; // R skoru temizlendikten sonra '0.' olarak ayarlandı
             nSizeInput.value = '';
             
             // Sonuç alanını gizle
             resultsArea.classList.add('hidden');
             
             // Genel mesaj
-            showMessage('Tüm veriler temizlendi. Yeni bir hesaplamaya başlayabilirsiniz.', 'bg-yellow-100 text-yellow-700');
-        }
-
-
-        /**
-         * Kullanıcıya geçici bir mesaj gösterir.
-         * @param {string} message Gösterilecek mesaj.
-         * @param {string} className Tailwind CSS sınıfları (renk/stil için).
-         */
-        function showMessage(message, className) {
-            messageArea.textContent = message;
-            messageArea.className = `text-sm text-center py-2 rounded-lg mt-2 ${className}`;
-            messageArea.classList.remove('hidden');
-            setTimeout(() => {
-                messageArea.classList.add('hidden');
-            }, 3000);
+            showMessage(translations[lang].msg_clear_all, 'bg-yellow-100 text-yellow-700');
         }
 
         /**
          * Birleştirilmiş r skorunu panoya kopyalar.
          */
         function copyResult() {
-            // Kopyalamadan önce skoru 3 ondalık haneye yuvarlayalım
+            const lang = currentLang;
             const textToCopy = combinedRText.textContent;
             
             // execCommand('copy') tarayıcı kısıtlamaları nedeniyle daha güvenilir bir yoldur.
@@ -339,23 +640,17 @@
             document.execCommand('copy');
             document.body.removeChild(tempInput);
 
-            copyMessageArea.textContent = `"${textToCopy}" panoya kopyalandı!`;
-            copyMessageArea.className = 'text-sm text-center py-1 rounded-lg mt-2 bg-green-100 text-green-700';
-            
-            // Mesaj alanını göster
-            copyMessageArea.classList.remove('hidden');
-            
-            setTimeout(() => {
-                copyMessageArea.classList.add('hidden');
-            }, 2000);
+            showMessage(translations[lang].msg_copy_success(textToCopy), 'bg-green-100 text-green-700');
         }
 
         /**
          * Fisher'ın Z dönüşümünü kullanarak birleştirilmiş Pearson r skorunu hesaplar.
+         * @param {boolean} skipHistorySave Geçmişe kaydetme işlemini atlamak için true.
          */
-        function calculateCombinedR() {
+        function calculateCombinedR(skipHistorySave = false) {
+            const lang = currentLang;
             if (correlationData.length < 2) {
-                showMessage('Hesaplama için en az 2 alt boyut korelasyonu gereklidir.', 'bg-red-100 text-red-700');
+                showMessage(translations[lang].msg_min_entries, 'bg-red-100 text-red-700');
                 resultsArea.classList.add('hidden');
                 return;
             }
@@ -391,7 +686,133 @@
             // Ortalama Z skoru gösterimi 4 ondalık hanede bırakıldı (istatistiksel doğruluk için)
             document.getElementById('avg_z').textContent = avgZ.toFixed(4);
             resultsArea.classList.remove('hidden');
+
+            // Hesaplama başarılı, geçmişe kaydetme kontrolü eklendi
+            if (!skipHistorySave) {
+                const newEntry = {
+                    timestamp: Date.now(),
+                    combinedR: combinedR,
+                    avgZ: avgZ,
+                    entries: correlationData.map(e => ({ title: e.title, r: e.r, n: e.n })) // Sadece gerekli verileri kopyala
+                };
+                saveHistory(newEntry);
+            }
         }
+        
+        /**
+         * Kullanıcıya geçici bir mesaj gösterir.
+         * @param {string} message Gösterilecek mesaj.
+         * @param {string} className Tailwind CSS sınıfları (renk/stil için).
+         */
+        function showMessage(message, className) {
+            messageArea.textContent = message;
+            messageArea.className = `text-sm text-center py-2 rounded-lg mt-2 ${className}`;
+            messageArea.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageArea.classList.add('hidden');
+            }, 3000);
+        }
+
+
+        // ******************** GEÇMİŞ YÖNETİMİ FONKSİYONLARI ********************
+
+        /**
+         * Geçmiş verilerini localStorage'dan yükler.
+         * @returns {Array} Geçmiş kayıtları dizisi.
+         */
+        function loadHistory() {
+            const historyData = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            renderHistoryList(historyData);
+            return historyData;
+        }
+
+        /**
+         * Yeni bir kaydı geçmişe ekler ve localStorage'a kaydeder.
+         * @param {object} newEntry Yeni kayıt verisi.
+         */
+        function saveHistory(newEntry) {
+            const historyData = loadHistory();
+            // Yeni kaydı en üste ekle
+            historyData.unshift(newEntry);
+            // Geçmişi son 10 kayıtla sınırla
+            const limitedHistory = historyData.slice(0, 10);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(limitedHistory));
+            renderHistoryList(limitedHistory);
+        }
+
+        /**
+         * Geçmiş listesini ekranda render eder.
+         * @param {Array} historyData Geçmiş kayıtları dizisi.
+         */
+        function renderHistoryList(historyData) {
+            if (!historyListElement) return; 
+
+            historyListElement.innerHTML = '';
+            
+            const clearHistoryButton = document.getElementById('clear_history_button');
+
+            if (historyData.length === 0) {
+                historyListElement.innerHTML = `<p class="text-gray-400 italic text-sm text-center py-4">${translations[currentLang].placeholder_history}</p>`;
+                clearHistoryButton.classList.add('hidden');
+                return;
+            }
+
+            historyData.forEach((entry, index) => {
+                const item = document.createElement('div');
+                item.className = 'bg-white p-3 rounded-lg border border-gray-200 shadow-sm transition duration-150 hover:bg-gray-100';
+                
+                const date = new Date(entry.timestamp).toLocaleString(currentLang === 'tr' ? 'tr-TR' : 'en-US', { dateStyle: 'short', timeStyle: 'short' });
+                
+                item.innerHTML = `
+                    <div class="flex justify-between items-center mb-2 border-b pb-1">
+                        <span class="text-sm font-semibold text-gray-800">${date} (${entry.entries.length} ${currentLang === 'tr' ? 'Alt Boyut' : 'Subscales'})</span>
+                        <span class="text-green-600 font-extrabold text-lg">r = ${entry.combinedR.toFixed(3)}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2 truncate">${currentLang === 'tr' ? 'Alt Boyutlar' : 'Subscales'}: ${entry.entries.map(e => e.title).join(' / ')}</p>
+                    <button onclick="restoreEntry(${index})" class="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition duration-150">${translations[currentLang].button_load}</button>
+                `;
+                historyListElement.appendChild(item);
+            });
+            
+            clearHistoryButton.classList.remove('hidden');
+        }
+
+        /**
+         * Geçmişteki bir kaydı çalışma alanına yükler.
+         * @param {number} index Yüklenecek kaydın indeksi.
+         */
+        function restoreEntry(index) {
+            const lang = currentLang;
+            const historyData = loadHistory();
+            const entry = historyData[index];
+            
+            // Veriyi çalışma alanına geri yükle
+            correlationData = entry.entries;
+            
+            // UI'ı güncelle
+            renderDataList();
+            
+            // Hesaplamayı yeniden yap ve sonucu göster. Kaydı yüklediğimiz için tekrar geçmişe KAYDETMEYİ atlıyoruz.
+            calculateCombinedR(true); // true parametresi, geçmişe kaydetmeyi atlar.
+            
+            showMessage(translations[lang].msg_restore_success(entry.combinedR.toFixed(3)), 'bg-indigo-100 text-indigo-700');
+        }
+
+        /**
+         * Tüm geçmiş kayıtlarını siler.
+         */
+        function clearHistory() {
+            const lang = currentLang;
+            if (localStorage.getItem(HISTORY_KEY)) {
+                localStorage.removeItem(HISTORY_KEY);
+                renderHistoryList([]);
+                showMessage(translations[lang].msg_history_cleared, 'bg-red-100 text-red-700');
+            }
+        }
+        
+        // Uygulama yüklendiğinde geçmişi başlat
+        window.onload = init;
 
     </script>
 </body>
