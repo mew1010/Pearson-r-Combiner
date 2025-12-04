@@ -1,0 +1,365 @@
+<!DOCTYPE atrocious:pearson_r_combiner.html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pearson r Skor Birleştirici</title>
+    <!-- Tailwind CSS Yükleniyor -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        /* İstatistiksel sembolleri daha belirgin ve hoş göstermek için özel stil */
+        .symbol {
+            font-weight: 700;
+            color: #1e40af; /* Tailwind blue-800 */
+        }
+        /* Şimşek Efekti (Daha Parlak) */
+        .footer-signature {
+            cursor: pointer;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .footer-signature:hover {
+            color: #3b82f6; /* Tailwind blue-500 (Daha parlak mavi) */
+            text-shadow: 0 0 10px #bfdbfe, /* Açık mavi/beyaz parıltı (blue-200) */
+                         0 0 20px #3b82f6; /* Ana mavi parıltı (blue-500) */
+        }
+        .footer-signature:active {
+            color: #1d4ed8; /* Tıklama anında daha koyu mavi */
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen flex items-center justify-center flex-col">
+
+    <div class="w-full max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-2">Pearson r Birleştirici</h1>
+            <p class="text-gray-500">Fisher'ın Z Dönüşümü ile ağırlıklı ortalama korelasyon hesaplama aracı.</p>
+        </header>
+
+        <div class="bg-white card rounded-xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Veri Giriş Alanı -->
+            <div>
+                <h2 class="text-xl font-bold text-indigo-600 mb-4 border-b pb-2">Alt Boyut ve r Katsayısı</h2>
+                
+                <div class="space-y-4">
+                    
+                    <!-- Alt Boyut Adı Girişi -->
+                    <div>
+                        <label for="entry_title" class="block text-sm font-medium text-gray-700 mb-1">Alt Boyut Adı (Örn: Planlama, İzleme, Değerlendirme):</label>
+                        <input type="text" id="entry_title" placeholder="Alt boyut adı"
+                               onkeydown="handleKeydown(event)"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        <p id="title_error" class="text-sm text-red-500 mt-1 hidden">Lütfen alt boyutun adını girin.</p>
+                    </div>
+
+                    <!-- r Katsayısı Girişi -->
+                    <div>
+                        <label for="r_score" class="block text-sm font-medium text-gray-700 mb-1">Korelasyon Katsayısı (<span class="symbol">r</span>):</label>
+                        <input type="number" id="r_score" placeholder="-1.0 ile 1.0 arasında" step="0.01" min="-1" max="1"
+                               onkeydown="handleKeydown(event)"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        <p id="r_error" class="text-sm text-red-500 mt-1 hidden">Lütfen -1 ile 1 arasında geçerli bir <span class="symbol">r</span> değeri girin.</p>
+                    </div>
+
+                    <!-- n Örneklem Büyüklüğü Girişi -->
+                    <div>
+                        <label for="n_size" class="block text-sm font-medium text-gray-700 mb-1">Örneklem Büyüklüğü (<span class="symbol">n</span>):</label>
+                        <input type="number" id="n_size" placeholder="Minimum 3 olmalıdır" step="1" min="3"
+                               onkeydown="handleKeydown(event)"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        <p id="n_error" class="text-sm text-red-500 mt-1 hidden">Lütfen 3 veya daha büyük bir <span class="symbol">n</span> değeri girin.</p>
+                    </div>
+
+                    <!-- Ekle Butonu -->
+                    <button onclick="addEntry()"
+                            class="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
+                        Alt Boyutu Ekle
+                    </button>
+                    
+                    <!-- Genel Mesaj Alanı -->
+                    <div id="message_area" class="text-sm text-center py-2 rounded-lg hidden"></div>
+                </div>
+            </div>
+
+            <!-- Girilen Veri ve Sonuç Alanı -->
+            <div>
+                <h2 class="text-xl font-bold text-green-600 mb-4 border-b pb-2">Girilen Korelasyonlar ve Sonuç</h2>
+                
+                <!-- Veri Listesi -->
+                <div id="data_list" class="space-y-2 max-h-64 overflow-y-auto mb-6 p-2 bg-gray-50 rounded-lg border">
+                    <!-- Veri girişleri buraya eklenecek -->
+                    <p id="placeholder_text" class="text-gray-400 italic text-sm text-center py-4">Henüz alt boyut korelasyonu eklenmedi.</p>
+                </div>
+
+                <!-- Hesapla Butonu -->
+                <button onclick="calculateCombinedR()"
+                        class="w-full bg-green-600 text-white font-semibold py-2.5 rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 disabled:bg-gray-400"
+                        id="calculate_button" disabled>
+                    Birleştirilmiş r'yi Hesapla
+                </button>
+
+                <!-- Sonuç Ekranı -->
+                <div id="results_area" class="mt-6 p-4 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Hesaplama Sonuçları</h3>
+                    <div class="space-y-2">
+                        <!-- Birleştirilmiş r skoru ve Kopyala butonu -->
+                        <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-indigo-200">
+                            <p class="text-base text-gray-700">
+                                <span class="font-medium text-indigo-700">Birleştirilmiş Pearson <span class="symbol">r</span>:</span> 
+                                <span id="combined_r" class="font-bold text-xl ml-2 text-indigo-900"></span>
+                            </p>
+                            <button onclick="copyResult()" id="copy_button"
+                                    class="bg-indigo-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-indigo-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                                Kopyala
+                            </button>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600"><span class="font-medium">Ortalama Fisher <span class="symbol">Z</span> (<span class="symbol">Z̄</span>):</span> <span id="avg_z" class="ml-2"></span></p>
+                        <p class="text-xs text-gray-500 italic">Not: Bu hesaplama, her bir alt boyut korelasyonunun örneklem büyüklüğü (<span class="symbol">n</span>) ile ağırlıklandırıldığı Fisher'ın <span class="symbol">Z</span> dönüşümüne dayanır.</p>
+                        
+                        <!-- Kopyalama geri bildirimi için mesaj alanı -->
+                        <div id="copy_message_area" class="text-sm text-center py-1 rounded-lg hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alt Bilgi (FOOTER) - EFEKT GÜNCELLENDİ -->
+    <footer class="mt-8 text-center text-gray-800 text-base font-bold italic flex flex-col items-center">
+        <span class="footer-signature">⚡ Made by Anıl Sarıalai ⚡</span> 
+        <span class="text-sm font-normal not-italic mt-1">
+            <a href="mailto:anilsarialai@gmail.com" class="text-gray-600 hover:text-indigo-600 transition duration-150">anilsarialai@gmail.com</a>
+        </span>
+    </footer>
+
+    <script>
+        // Uygulama verilerini tutan global dizi
+        let correlationData = [];
+        
+        // Element referansları
+        const titleInput = document.getElementById('entry_title');
+        const rScoreInput = document.getElementById('r_score');
+        const nSizeInput = document.getElementById('n_size');
+        const titleError = document.getElementById('title_error');
+        const rError = document.getElementById('r_error');
+        const nError = document.getElementById('n_error');
+        const dataList = document.getElementById('data_list');
+        const placeholderText = document.getElementById('placeholder_text');
+        const calculateButton = document.getElementById('calculate_button');
+        const resultsArea = document.getElementById('results_area');
+        const messageArea = document.getElementById('message_area');
+        const combinedRText = document.getElementById('combined_r');
+        const copyMessageArea = document.getElementById('copy_message_area');
+
+
+        /**
+         * Input alanlarında Enter tuşuna basıldığında veri setini ekler.
+         * @param {Event} event Klavye olayı.
+         */
+        function handleKeydown(event) {
+            // Kontrol: Basılan tuş Enter mı?
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                event.preventDefault(); // Varsayılan formu gönderme davranışını engelle
+                addEntry();
+            }
+        }
+
+        /**
+         * Hata mesajlarını gösterir/gizler.
+         * @param {HTMLElement} element Hata mesajı elementi.
+         * @param {boolean} isVisible Görünürlük durumu.
+         */
+        function toggleError(element, isVisible) {
+            element.classList.toggle('hidden', !isVisible);
+        }
+
+        /**
+         * Yeni bir (r, n) çiftini veri listesine ekler.
+         */
+        function addEntry() {
+            const title = titleInput.value.trim();
+            const r = parseFloat(rScoreInput.value);
+            const n = parseInt(nSizeInput.value, 10);
+            let isValid = true;
+
+            // 1. Giriş Doğrulamaları
+            if (title === "") {
+                toggleError(titleError, true);
+                isValid = false;
+            } else {
+                toggleError(titleError, false);
+            }
+
+            if (isNaN(r) || r < -1 || r > 1) {
+                toggleError(rError, true);
+                isValid = false;
+            } else {
+                toggleError(rError, false);
+            }
+
+            if (isNaN(n) || n < 3) {
+                toggleError(nError, true);
+                isValid = false;
+            } else {
+                toggleError(nError, false);
+            }
+
+            if (!isValid) {
+                showMessage('Lütfen tüm geçerli alanları doldurun.', 'bg-red-100 text-red-700');
+                return;
+            }
+
+            // 2. Veriyi Diziye Ekle (Başlık dahil)
+            correlationData.push({ title, r, n });
+            
+            // 3. UI Güncelleme
+            titleInput.value = '';
+            rScoreInput.value = '';
+            nSizeInput.value = '';
+            titleInput.focus(); // Başlık alanına odaklanarak hızlı giriş sağlama
+            
+            renderDataList();
+            
+            showMessage(`"${title}" alt boyutu başarıyla eklendi.`, 'bg-green-100 text-green-700');
+            
+            // 4. Hesapla butonunu etkinleştirme
+            calculateButton.disabled = correlationData.length < 2;
+        }
+
+        /**
+         * Veri listesini (title, r, n) çiftleriyle yeniden oluşturur.
+         */
+        function renderDataList() {
+            dataList.innerHTML = '';
+            if (correlationData.length === 0) {
+                dataList.innerHTML = '<p id="placeholder_text" class="text-gray-400 italic text-sm text-center py-4">Henüz alt boyut korelasyonu eklenmedi.</p>';
+                resultsArea.classList.add('hidden');
+                calculateButton.disabled = true;
+                return;
+            }
+
+            correlationData.forEach((data, index) => {
+                const item = document.createElement('div');
+                item.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-3 rounded-lg border border-gray-200';
+                item.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="font-bold text-gray-800">${data.title}</span>
+                        <!-- R skoru gösterimi 3 ondalık haneye (toFixed(3)) ayarlandı -->
+                        <span class="text-gray-600 text-sm mt-1">r = ${data.r.toFixed(3)}, n = ${data.n}</span>
+                    </div>
+                    <button onclick="removeEntry(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold transition duration-150 mt-2 sm:mt-0">Kaldır</button>
+                `;
+                dataList.appendChild(item);
+            });
+        }
+
+        /**
+         * Belirtilen indeksteki veri girişini diziden kaldırır.
+         * @param {number} index Kaldırılacak verinin indeksi.
+         */
+        function removeEntry(index) {
+            correlationData.splice(index, 1);
+            renderDataList();
+            showMessage('Alt boyut korelasyonu kaldırıldı.', 'bg-yellow-100 text-yellow-700');
+            calculateButton.disabled = correlationData.length < 2;
+            if (correlationData.length < 2) {
+                resultsArea.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Kullanıcıya geçici bir mesaj gösterir.
+         * @param {string} message Gösterilecek mesaj.
+         * @param {string} className Tailwind CSS sınıfları (renk/stil için).
+         */
+        function showMessage(message, className) {
+            messageArea.textContent = message;
+            messageArea.className = `text-sm text-center py-2 rounded-lg mt-2 ${className}`;
+            messageArea.classList.remove('hidden');
+            setTimeout(() => {
+                messageArea.classList.add('hidden');
+            }, 3000);
+        }
+
+        /**
+         * Birleştirilmiş r skorunu panoya kopyalar.
+         */
+        function copyResult() {
+            // Kopyalamadan önce skoru 3 ondalık haneye yuvarlayalım
+            const textToCopy = combinedRText.textContent;
+            
+            // execCommand('copy') tarayıcı kısıtlamaları nedeniyle daha güvenilir bir yoldur.
+            const tempInput = document.createElement('input');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            copyMessageArea.textContent = `"${textToCopy}" panoya kopyalandı!`;
+            copyMessageArea.className = 'text-sm text-center py-1 rounded-lg mt-2 bg-green-100 text-green-700';
+            
+            // Mesaj alanını göster
+            copyMessageArea.classList.remove('hidden');
+            
+            setTimeout(() => {
+                copyMessageArea.classList.add('hidden');
+            }, 2000);
+        }
+
+        /**
+         * Fisher'ın Z dönüşümünü kullanarak birleştirilmiş Pearson r skorunu hesaplar.
+         */
+        function calculateCombinedR() {
+            if (correlationData.length < 2) {
+                showMessage('Hesaplama için en az 2 alt boyut korelasyonu gereklidir.', 'bg-red-100 text-red-700');
+                resultsArea.classList.add('hidden');
+                return;
+            }
+
+            let sumWeightedZ = 0;
+            let sumWeights = 0;
+
+            correlationData.forEach(data => {
+                const r = data.r;
+                const n = data.n;
+                
+                // 1. Fisher's Z Dönüşümü: Z = 0.5 * ln((1 + r) / (1 - r))
+                // Math.log() doğal logaritma (ln) kullanır.
+                const z = 0.5 * Math.log((1 + r) / (1 - r));
+                
+                // 2. Ağırlık (Weight): w = n - 3 (Varyansın tersi)
+                const weight = n - 3;
+                
+                sumWeightedZ += weight * z;
+                sumWeights += weight;
+            });
+
+            // 3. Ağırlıklı Ortalama Z: Z_avg = (Σw_i * Z_i) / (Σw_i)
+            const avgZ = sumWeightedZ / sumWeights;
+
+            // 4. Z'yi Geri r'ye Dönüştürme: r = (e^(2Z) - 1) / (e^(2Z) + 1)
+            const exp2Z = Math.exp(2 * avgZ);
+            const combinedR = (exp2Z - 1) / (exp2Z + 1);
+
+            // Sonuçları göster
+            // Birleştirilmiş r skoru gösterimi 3 ondalık haneye (toFixed(3)) ayarlandı
+            combinedRText.textContent = combinedR.toFixed(3);
+            // Ortalama Z skoru gösterimi 4 ondalık hanede bırakıldı (istatistiksel doğruluk için)
+            document.getElementById('avg_z').textContent = avgZ.toFixed(4);
+            resultsArea.classList.remove('hidden');
+        }
+
+    </script>
+</body>
+</html>
