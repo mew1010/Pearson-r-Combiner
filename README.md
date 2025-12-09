@@ -1,1 +1,1 @@
-A simple pearson r combiner made by me.
+A simple academic superapp for academic & research purposes.
